@@ -2,7 +2,6 @@
 //!
 //! The crate provides a trait and a procedural macro. By deriving one, you implement the
 //! trait with `fn id() -> TypeId` static method which is unique in the whole project.
-//! Call API methods to interact with the service directly or user an iterator-like interface to
 //!
 //! For examples, see the `tests` directory in the source tree.
 //!
