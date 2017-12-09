@@ -1,13 +1,18 @@
 [package]
 name = "unique-type-id"
-version = "0.1.1"
+version = "0.1.2"
 authors = ["Victor Polevoy <fx@thefx.co>"]
 
 license = "MIT"
 description = "A unique id proc-macro generator for types."
 keywords = ["unique", "type", "id", "number"]
-
 repository = "https://github.com/vityafx/unique-type-id"
+documentation = "https://docs.rs/unique-typeid/"
+readme = "README.md"
+categories = ["development-tools"]
+
+[badges]
+travis-ci = { repository = "vityafx/unique-type-id" }
 
 [dependencies]
 syn = "0.11"
