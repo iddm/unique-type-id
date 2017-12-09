@@ -48,19 +48,19 @@ fn record_in_pair(record: &str, pair_string: &str) -> bool {
     false
 }
 
-fn value_from_pair(pair_string: &str) -> u64 {
-    pair_string.split('=').nth(1).unwrap_or("0").parse::<u64>().expect("Could not parse the number.")
+fn value_from_pair(pair_string: &str) -> Option<u64> {
+    pair_string.split('=').nth(1).unwrap_or("").parse::<u64>().ok()
 }
 
 fn find_record(file_contents: &str, record: &str) -> Option<u64> {
     let mut lines = file_contents.split('\n');
-    lines.find(|s| record_in_pair(record, s)).map(value_from_pair)
+    lines.find(|s| record_in_pair(record, s)).map(value_from_pair)?
 }
 
 fn last_id(file_contents: &str) -> u64 {
     let mut last_id = 0;
     let lines = file_contents.split('\n');
-    lines.for_each(|line| last_id = std::cmp::max(last_id, value_from_pair(line)));
+    lines.for_each(|line| last_id = std::cmp::max(last_id, value_from_pair(line).unwrap_or(0)));
     last_id
 }
 
