@@ -1,0 +1,12 @@
+[package]
+name = "unique_type_id_workspace"
+version = "0.1.0"
+authors = ["Victor Polevoy <maintainer@vpolevoy.com>"]
+
+description = "A workspace for the unique type id crate."
+
+[dependencies]
+unique-type-id-derive = { path = "unique-type-id-derive" }
+unique-type-id = { path = "unique-type-id" }
+
+[workspace]

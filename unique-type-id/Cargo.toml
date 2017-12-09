@@ -1,0 +1,14 @@
+[package]
+name = "unique-type-id"
+version = "0.1.0"
+authors = ["Victor Polevoy <fx@thefx.co>"]
+
+license = "MIT"
+description = "A unique id proc-macro generator for types."
+keywords = ["unique", "type", "id", "number"]
+
+repository = "https://github.com/vityafx/unique-type-id"
+
+[dependencies]
+syn = "0.11"
+quote = "0.3"
