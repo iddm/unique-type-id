@@ -7,21 +7,28 @@ extern crate unique_type_id;
 extern crate fs2;
 
 use std::fs::File;
+use std::collections::BTreeMap;
 
 use proc_macro::TokenStream;
 use fs2::FileExt;
 
 static TYPES_FILE_NAME: &'static str = "types.toml";
 
-#[proc_macro_derive(SequentialTypeId, attributes(UniqueTypeIdFile))]
-pub fn sequential_type_id(input: TokenStream) -> TokenStream {
-    implement_type_id(input, sequential_implementor)
+type Value = u64;
+type PairsMap = BTreeMap<String, Value>;
+
+#[proc_macro_derive(UniqueTypeId, attributes(UniqueTypeIdFile))]
+pub fn unique_type_id(input: TokenStream) -> TokenStream {
+    implement_type_id(input, unique_implementor)
 }
 
 fn read_file_into_string(file_name: &str) -> String {
     use std::io::Read;
 
-    let mut f = File::open(file_name).expect("File not found");
+    let mut f = match File::open(file_name) {
+        Ok(f) => f,
+        Err(_) => return String::default(),
+    };
     f.lock_exclusive().expect("Unable to lock the file");
     let mut contents = String::new();
     f.read_to_string(&mut contents).expect("Unable to read the file");
@@ -29,52 +36,56 @@ fn read_file_into_string(file_name: &str) -> String {
     contents
 }
 
-fn append_pair_to_file(file_name: &str, record: &str, value: u64) {
+fn file_string_to_tree(file_contents: String) -> PairsMap {
+    let mut map = PairsMap::new();
+    file_contents.split('\n')
+        .map(pair_from_line)
+        .filter(Option::is_some)
+        .map(Option::unwrap)
+        .for_each(|p| { map.insert(p.0, p.1); });
+    map
+}
+
+fn pair_from_line(line: &str) -> Option<(String, Value)> {
+    let mut pair = line.split('=');
+    let key = pair.next()?.to_owned();
+    let value = pair.next()?.parse::<Value>().ok()?;
+    Some((key, value))
+}
+
+fn append_pair_to_file(file_name: &str, record: &str, value: Value) {
     use std::io::Write;
     use std::fs::OpenOptions;
 
-    let mut f = OpenOptions::new().write(true).append(true).open(file_name).expect("Unable to create file");
+    let mut f = OpenOptions::new()
+        .write(true)
+        .append(true)
+        .create(true)
+        .open(file_name).expect("Unable to create file");
     f.lock_exclusive().expect("Unable to lock the file");
     let contents = format!("{}={}\n", record, value);
     f.write_all(contents.as_bytes()).expect("Unable to write to the file");
     f.unlock().expect("Unable to unlock the file");
 }
 
-fn record_in_pair(record: &str, pair_string: &str) -> bool {
-    if let Some(r) = pair_string.split('=').next() {
-        return r == record
-    }
-
-    false
-}
-
-fn value_from_pair(pair_string: &str) -> Option<u64> {
-    pair_string.split('=').nth(1).unwrap_or("").parse::<u64>().ok()
-}
-
-fn find_record(file_contents: &str, record: &str) -> Option<u64> {
-    let mut lines = file_contents.split('\n');
-    lines.find(|s| record_in_pair(record, s)).map(value_from_pair)?
-}
-
-fn last_id(file_contents: &str) -> u64 {
-    let mut last_id = 0;
-    let lines = file_contents.split('\n');
-    lines.for_each(|line| last_id = std::cmp::max(last_id, value_from_pair(line).unwrap_or(0)));
-    last_id
-}
-
-fn gen_id(file_name: &str, record: &str) -> u64 {
-    let file_contents = read_file_into_string(file_name);
-    let id = match find_record(&file_contents, record) {
-        Some(id) => id,
+fn gen_id(file_name: &str, record: &str) -> Value {
+    let pairs_map = file_string_to_tree(read_file_into_string(file_name));
+    match pairs_map.get(record) {
+        Some(record_id) => record_id.to_owned(),
         None => {
-            let new_id = last_id(&file_contents) + 1;
+            let mut new_id = 0;
+
+            loop {
+                if !pairs_map.values().find(|id| &new_id == *id).is_some() {
+                    break;
+                }
+                new_id += 1;
+            }
+
             append_pair_to_file(file_name, record, new_id);
             new_id
         },
-    };
-    id
+    }
 }
 
 fn implement_type_id(input: TokenStream, implementor: fn(&syn::DeriveInput) -> quote::Tokens) -> TokenStream {
@@ -105,14 +116,14 @@ fn parse_types_file_name(attrs: &[syn::Attribute]) -> String {
 }
 
 
-fn sequential_implementor(ast: &syn::DeriveInput) -> quote::Tokens {
+fn unique_implementor(ast: &syn::DeriveInput) -> quote::Tokens {
     let name = &ast.ident;
     let (impl_generics, ty_generics, where_clause) = ast.generics.split_for_impl();
     let types_file_name = parse_types_file_name(&ast.attrs);
     let id = gen_id(&types_file_name, name.as_ref());
 
     quote! {
-        impl #impl_generics unique_type_id::SequentialTypeId for #name #ty_generics #where_clause {
+        impl #impl_generics unique_type_id::UniqueTypeId for #name #ty_generics #where_clause {
             fn id() -> unique_type_id::TypeId {
                 unique_type_id::TypeId(#id)
             }

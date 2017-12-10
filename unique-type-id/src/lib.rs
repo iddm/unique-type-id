@@ -1,23 +1,26 @@
 //! A unique id generator for rust types.
 //!
 //! The crate provides a trait and a procedural macro. By deriving one, you implement the
-//! trait with `fn id() -> TypeId` static method which is unique in the whole project.
+//! trait with `fn id() -> TypeId` static method. The type id is unique in the whole project.
 //!
 //! For examples, see the `tests` directory in the source tree.
 //!
 //! # Usage
+//!
+//! The example usage:
 //!
 //! ```rust
 //!#[macro_use]
 //!extern crate unique_type_id_derive;
 //!extern crate unique_type_id;
 //!
-//!fn sequential_id() {
-//!    use unique_type_id::SequentialTypeId;
+//!fn check_id() {
+//!    use unique_type_id::UniqueTypeId;
 //!
-//!    #[derive(SequentialTypeId)]
+//!    // This code uses "types.toml" (the default) file for ids.
+//!    #[derive(UniqueTypeId)]
 //!    struct Test1;
-//!    #[derive(SequentialTypeId)]
+//!    #[derive(UniqueTypeId)]
 //!    struct Test2;
 //!
 //!    assert_eq!(Test1::id().0, 1u64);
@@ -29,8 +32,8 @@ extern crate quote;
 /// A strong type for type id.
 pub struct TypeId(pub u64);
 
-/// A trait for providing a sequential type id number.
-pub trait SequentialTypeId {
-    /// Provides sequential type id number.
+/// A trait for providing a type id number.
+pub trait UniqueTypeId {
+    /// Returns the type id number.
     fn id() -> TypeId;
 }
