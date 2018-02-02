@@ -14,7 +14,14 @@ cache:
         - $TRAVIS_BUILD_DIR/target
         - $HOME/.cargo
 
+before_script:
+  - export PATH="$PATH:$HOME/.cargo/bin"
+  - rustup install nightly
+  - cargo +nightly install --force rustfmt-nightly
+
 script:
+  - cargo +nightly fmt -- --write-mode diff
+  - cargo check
   - cargo test --verbose $FEATURES -- --nocapture
 
 addons:
