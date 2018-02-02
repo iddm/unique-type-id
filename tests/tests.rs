@@ -1,7 +1,6 @@
+extern crate unique_type_id;
 #[macro_use]
 extern crate unique_type_id_derive;
-extern crate unique_type_id;
-
 
 #[test]
 fn check_simple() {

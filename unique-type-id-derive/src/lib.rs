@@ -1,10 +1,10 @@
-#![recursion_limit="128"]
+#![recursion_limit = "128"]
+extern crate fs2;
 extern crate proc_macro;
-extern crate syn;
 #[macro_use]
 extern crate quote;
+extern crate syn;
 extern crate unique_type_id;
-extern crate fs2;
 
 use std::fs::File;
 use std::collections::BTreeMap;
@@ -31,18 +31,22 @@ fn read_file_into_string(file_name: &str) -> String {
     };
     f.lock_exclusive().expect("Unable to lock the file");
     let mut contents = String::new();
-    f.read_to_string(&mut contents).expect("Unable to read the file");
+    f.read_to_string(&mut contents)
+        .expect("Unable to read the file");
     f.unlock().expect("Unable to unlock the file");
     contents
 }
 
 fn file_string_to_tree(file_contents: String) -> PairsMap {
     let mut map = PairsMap::new();
-    file_contents.split('\n')
+    file_contents
+        .split('\n')
         .map(pair_from_line)
         .filter(Option::is_some)
         .map(Option::unwrap)
-        .for_each(|p| { map.insert(p.0, p.1); });
+        .for_each(|p| {
+            map.insert(p.0, p.1);
+        });
     map
 }
 
@@ -61,10 +65,12 @@ fn append_pair_to_file(file_name: &str, record: &str, value: Value) {
         .write(true)
         .append(true)
         .create(true)
-        .open(file_name).expect("Unable to create file");
+        .open(file_name)
+        .expect("Unable to create file");
     f.lock_exclusive().expect("Unable to lock the file");
     let contents = format!("{}={}\n", record, value);
-    f.write_all(contents.as_bytes()).expect("Unable to write to the file");
+    f.write_all(contents.as_bytes())
+        .expect("Unable to write to the file");
     f.unlock().expect("Unable to unlock the file");
 }
 
@@ -84,11 +90,14 @@ fn gen_id(file_name: &str, record: &str) -> Value {
 
             append_pair_to_file(file_name, record, new_id);
             new_id
-        },
+        }
     }
 }
 
-fn implement_type_id(input: TokenStream, implementor: fn(&syn::DeriveInput) -> quote::Tokens) -> TokenStream {
+fn implement_type_id(
+    input: TokenStream,
+    implementor: fn(&syn::DeriveInput) -> quote::Tokens,
+) -> TokenStream {
     // Construct a string representation of the type definition
     let s = input.to_string();
 
@@ -103,18 +112,20 @@ fn implement_type_id(input: TokenStream, implementor: fn(&syn::DeriveInput) -> q
 }
 
 fn parse_types_file_name(attrs: &[syn::Attribute]) -> String {
-    let name = attrs.iter().filter(|a| a.value.name() == "UniqueTypeIdFile").next();
+    let name = attrs
+        .iter()
+        .filter(|a| a.value.name() == "UniqueTypeIdFile")
+        .next();
     if let Some(name) = name {
         if let syn::MetaItem::NameValue(_, ref value) = name.value {
             match value {
                 &syn::Lit::Str(ref value, _) => return value.to_owned(),
-                _ => {},
+                _ => {}
             }
         }
     }
     TYPES_FILE_NAME.to_owned()
 }
-
 
 fn unique_implementor(ast: &syn::DeriveInput) -> quote::Tokens {
     let name = &ast.ident;
