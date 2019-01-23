@@ -87,3 +87,22 @@ fn check_simple_empty_file() {
     assert!(unique_ids.contains(&1u64));
     assert_ne!(Test1::id().0, Test2::id().0);
 }
+
+#[test]
+fn check_empty_file_custom_start() {
+    use unique_type_id::UniqueTypeId;
+    #[derive(UniqueTypeId)]
+    #[UniqueTypeIdFile = "types4.toml"]
+    #[UniqueTypeIdStart = 23]
+    struct Test1;
+    #[derive(UniqueTypeId)]
+    #[UniqueTypeIdFile = "types4.toml"]
+    #[UniqueTypeIdStart = 23]
+    struct Test2;
+
+    // One of Test1 or Test2 should get "23", and the other should get "24"
+    let unique_ids = [Test1::id().0, Test2::id().0];
+    assert!(unique_ids.contains(&23u64));
+    assert!(unique_ids.contains(&24u64));
+    assert_ne!(Test1::id().0, Test2::id().0);
+}
