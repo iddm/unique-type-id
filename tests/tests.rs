@@ -67,6 +67,9 @@ fn check_simple_empty_file() {
     #[UniqueTypeIdFile = "types3.toml"]
     struct Test2;
 
-    assert_eq!(Test1::id().0, 0u64);
-    assert_eq!(Test2::id().0, 1u64);
+    // One of Test1 or Test2 should get "0", and the other should get "1"
+    let unique_ids = [Test1::id().0, Test2::id().0];
+    assert!(unique_ids.contains(&0u64));
+    assert!(unique_ids.contains(&1u64));
+    assert_ne!(Test1::id().0, Test2::id().0);
 }
