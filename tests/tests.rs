@@ -15,6 +15,20 @@ fn check_simple() {
 }
 
 #[test]
+fn check_simple_custom_type() {
+    use unique_type_id::UniqueTypeId;
+    #[derive(UniqueTypeId)]
+    #[UniqueTypeIdType = "i16"]
+    struct Test1;
+    #[derive(UniqueTypeId)]
+    #[UniqueTypeIdType = "i16"]
+    struct Test2;
+
+    assert_eq!(Test1::id().0, 1i16);
+    assert_eq!(Test2::id().0, 2i16);
+}
+
+#[test]
 fn check_simple_second() {
     use unique_type_id::UniqueTypeId;
     #[derive(UniqueTypeId)]
