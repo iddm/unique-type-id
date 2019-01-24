@@ -12,12 +12,13 @@ use std::collections::BTreeMap;
 use proc_macro::TokenStream;
 use fs2::FileExt;
 
-static TYPES_FILE_NAME: &'static str = "types.toml";
+static DEFAULT_TYPES_FILE_NAME: &'static str = "types.toml";
+static DEFAULT_ID_TYPE: &'static str = "u64";
+static DEFAULT_ID_START: &'static str = "0";
 
-type Value = u64;
-type PairsMap = BTreeMap<String, Value>;
+type PairsMap = BTreeMap<String, u64>;
 
-#[proc_macro_derive(UniqueTypeId, attributes(UniqueTypeIdFile))]
+#[proc_macro_derive(UniqueTypeId, attributes(UniqueTypeIdFile, UniqueTypeIdType, UniqueTypeIdStart))]
 pub fn unique_type_id(input: TokenStream) -> TokenStream {
     implement_type_id(input, unique_implementor)
 }
@@ -50,14 +51,14 @@ fn file_string_to_tree(file_contents: String) -> PairsMap {
     map
 }
 
-fn pair_from_line(line: &str) -> Option<(String, Value)> {
+fn pair_from_line(line: &str) -> Option<(String, u64)> {
     let mut pair = line.split('=');
     let key = pair.next()?.to_owned();
-    let value = pair.next()?.parse::<Value>().ok()?;
+    let value = pair.next()?.parse::<u64>().ok()?;
     Some((key, value))
 }
 
-fn append_pair_to_file(file_name: &str, record: &str, value: Value) {
+fn append_pair_to_file(file_name: &str, record: &str, value: u64) {
     use std::io::Write;
     use std::fs::OpenOptions;
 
@@ -74,12 +75,12 @@ fn append_pair_to_file(file_name: &str, record: &str, value: Value) {
     f.unlock().expect("Unable to unlock the file");
 }
 
-fn gen_id(file_name: &str, record: &str) -> Value {
+fn gen_id(file_name: &str, record: &str, start: u64) -> u64 {
     let pairs_map = file_string_to_tree(read_file_into_string(file_name));
     match pairs_map.get(record) {
         Some(record_id) => record_id.to_owned(),
         None => {
-            let mut new_id = 0;
+            let mut new_id = start;
 
             loop {
                 if !pairs_map.values().find(|id| &new_id == *id).is_some() {
@@ -111,32 +112,38 @@ fn implement_type_id(
     gen.parse().unwrap()
 }
 
-fn parse_types_file_name(attrs: &[syn::Attribute]) -> String {
+fn parse_attribute(attrs: &[syn::Attribute], name: &str, default: &str) -> String {
     let name = attrs
         .iter()
-        .filter(|a| a.value.name() == "UniqueTypeIdFile")
+        .filter(|a| a.value.name() == name)
         .next();
     if let Some(name) = name {
-        if let syn::MetaItem::NameValue(_, ref value) = name.value {
+        if let syn::MetaItem::NameValue(ref ident, ref value) = name.value {
             match value {
                 &syn::Lit::Str(ref value, _) => return value.to_owned(),
-                _ => {}
+                &syn::Lit::Int(ref value, _) => return value.to_string(),
+                _ => panic!("Unable to interpret {} value: {:?}", ident, value),
             }
         }
     }
-    TYPES_FILE_NAME.to_owned()
+    default.to_owned()
 }
 
 fn unique_implementor(ast: &syn::DeriveInput) -> quote::Tokens {
     let name = &ast.ident;
     let (impl_generics, ty_generics, where_clause) = ast.generics.split_for_impl();
-    let types_file_name = parse_types_file_name(&ast.attrs);
-    let id = gen_id(&types_file_name, name.as_ref());
+    let types_file_name = parse_attribute(&ast.attrs, "UniqueTypeIdFile", DEFAULT_TYPES_FILE_NAME);
+    let id_type_name = parse_attribute(&ast.attrs, "UniqueTypeIdType", DEFAULT_ID_TYPE);
+    let gen_start: u64 = parse_attribute(&ast.attrs, "UniqueTypeIdStart", DEFAULT_ID_START).parse().unwrap();
+    let id_type = syn::parse_type(&id_type_name).unwrap();
+    let id = gen_id(&types_file_name, name.as_ref(), gen_start);
 
+    // TODO: Use TryFrom instead of `#id as #id_type` to avoid silently destructive casts
     quote! {
-        impl #impl_generics unique_type_id::UniqueTypeId for #name #ty_generics #where_clause {
-            fn id() -> unique_type_id::TypeId {
-                unique_type_id::TypeId(#id)
+        impl #impl_generics unique_type_id::UniqueTypeId<#id_type> for #name #ty_generics #where_clause {
+            const TYPE_ID: unique_type_id::TypeId<#id_type> = unique_type_id::TypeId(#id as #id_type);
+            fn id() -> unique_type_id::TypeId<#id_type> {
+              Self::TYPE_ID
             }
         }
     }

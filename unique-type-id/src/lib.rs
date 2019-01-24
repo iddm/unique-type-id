@@ -26,14 +26,17 @@
 //!    assert_eq!(Test1::id().0, 1u64);
 //!    assert_eq!(Test2::id().0, 2u64);
 //!}
+//! ```
 extern crate quote;
 extern crate syn;
 
 /// A strong type for type id.
-pub struct TypeId(pub u64);
+pub struct TypeId<T>(pub T);
 
 /// A trait for providing a type id number.
-pub trait UniqueTypeId {
+pub trait UniqueTypeId<T> {
+    const TYPE_ID: TypeId<T>;
+
     /// Returns the type id number.
-    fn id() -> TypeId;
+    fn id() -> TypeId<T>;
 }
