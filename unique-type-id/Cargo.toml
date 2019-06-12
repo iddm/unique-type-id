@@ -15,5 +15,5 @@ categories = ["development-tools"]
 travis-ci = { repository = "vityafx/unique-type-id" }
 
 [dependencies]
-syn = "0.11"
+syn = "0.15"
 quote = "0.3"
