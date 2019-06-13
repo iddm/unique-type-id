@@ -6,11 +6,11 @@ extern crate quote;
 extern crate syn;
 extern crate unique_type_id;
 
-use std::fs::File;
 use std::collections::BTreeMap;
+use std::fs::File;
 
-use proc_macro::TokenStream;
 use fs2::FileExt;
+use proc_macro::TokenStream;
 
 static DEFAULT_TYPES_FILE_NAME: &'static str = "types.toml";
 static DEFAULT_ID_TYPE: &'static str = "u64";
@@ -18,7 +18,10 @@ static DEFAULT_ID_START: &'static str = "0";
 
 type PairsMap = BTreeMap<String, u64>;
 
-#[proc_macro_derive(UniqueTypeId, attributes(UniqueTypeIdFile, UniqueTypeIdType, UniqueTypeIdStart))]
+#[proc_macro_derive(
+    UniqueTypeId,
+    attributes(UniqueTypeIdFile, UniqueTypeIdType, UniqueTypeIdStart)
+)]
 pub fn unique_type_id(input: TokenStream) -> TokenStream {
     implement_type_id(input, unique_implementor)
 }
@@ -59,8 +62,8 @@ fn pair_from_line(line: &str) -> Option<(String, u64)> {
 }
 
 fn append_pair_to_file(file_name: &str, record: &str, value: u64) {
-    use std::io::Write;
     use std::fs::OpenOptions;
+    use std::io::Write;
 
     let mut f = OpenOptions::new()
         .write(true)
@@ -113,10 +116,7 @@ fn implement_type_id(
 }
 
 fn parse_attribute(attrs: &[syn::Attribute], name: &str, default: &str) -> String {
-    let name = attrs
-        .iter()
-        .filter(|a| a.value.name() == name)
-        .next();
+    let name = attrs.iter().filter(|a| a.value.name() == name).next();
     if let Some(name) = name {
         if let syn::MetaItem::NameValue(ref ident, ref value) = name.value {
             match value {
@@ -134,7 +134,9 @@ fn unique_implementor(ast: &syn::DeriveInput) -> quote::Tokens {
     let (impl_generics, ty_generics, where_clause) = ast.generics.split_for_impl();
     let types_file_name = parse_attribute(&ast.attrs, "UniqueTypeIdFile", DEFAULT_TYPES_FILE_NAME);
     let id_type_name = parse_attribute(&ast.attrs, "UniqueTypeIdType", DEFAULT_ID_TYPE);
-    let gen_start: u64 = parse_attribute(&ast.attrs, "UniqueTypeIdStart", DEFAULT_ID_START).parse().unwrap();
+    let gen_start: u64 = parse_attribute(&ast.attrs, "UniqueTypeIdStart", DEFAULT_ID_START)
+        .parse()
+        .unwrap();
     let id_type = syn::parse_type(&id_type_name).unwrap();
     let id = gen_id(&types_file_name, name.as_ref(), gen_start);
 
