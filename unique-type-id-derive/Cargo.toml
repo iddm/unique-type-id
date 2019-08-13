@@ -14,6 +14,6 @@ proc-macro = true
 
 [dependencies]
 syn = "0.11"
-quote = "0.3"
+quote = "1.0"
 unique-type-id = { path = "../unique-type-id", version = "0.2" }
 fs2 = "0.4"
