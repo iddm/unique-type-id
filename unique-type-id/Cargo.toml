@@ -1,6 +1,6 @@
 [package]
 name = "unique-type-id"
-version = "0.2.0"
+version = "1.0.0"
 authors = ["Victor Polevoy <fx@thefx.co>"]
 
 license = "MIT"
@@ -15,5 +15,5 @@ categories = ["development-tools"]
 travis-ci = { repository = "vityafx/unique-type-id" }
 
 [dependencies]
-syn = "0.11"
-quote = "0.3"
+syn = "1"
+quote = "1"

@@ -3,6 +3,7 @@ extern crate fs2;
 extern crate proc_macro;
 #[macro_use]
 extern crate quote;
+#[macro_use]
 extern crate syn;
 extern crate unique_type_id;
 
@@ -100,36 +101,42 @@ fn gen_id(file_name: &str, record: &str, start: u64) -> u64 {
 
 fn implement_type_id(
     input: TokenStream,
-    implementor: fn(&syn::DeriveInput) -> quote::Tokens,
+    implementor: fn(&syn::DeriveInput) -> TokenStream,
 ) -> TokenStream {
-    // Construct a string representation of the type definition
-    let s = input.to_string();
-
-    // Parse the string representation
-    let ast = syn::parse_derive_input(&s).unwrap();
-
-    // Build the impl
-    let gen = implementor(&ast);
-
-    // Return the generated impl
-    gen.parse().unwrap()
+    let ast = parse_macro_input!(input as syn::DeriveInput);
+    implementor(&ast).into()
 }
 
 fn parse_attribute(attrs: &[syn::Attribute], name: &str, default: &str) -> String {
-    let name = attrs.iter().filter(|a| a.value.name() == name).next();
-    if let Some(name) = name {
-        if let syn::MetaItem::NameValue(ref ident, ref value) = name.value {
-            match value {
-                &syn::Lit::Str(ref value, _) => return value.to_owned(),
-                &syn::Lit::Int(ref value, _) => return value.to_string(),
-                _ => panic!("Unable to interpret {} value: {:?}", ident, value),
-            }
-        }
-    }
-    default.to_owned()
+    use syn::spanned::Spanned;
+
+    attrs
+        .iter()
+        .find(|a| a.path.is_ident(name))
+        .map(|a| {
+            a.tokens
+                .clone()
+                .into_iter()
+                // Taking the second part of tokens, after the `=` sign.
+                .nth(1)
+                .ok_or_else(|| {
+                    syn::Error::new(
+                        a.span(),
+                        format!(
+                            r#"The attribute should be in the format: `{} = "{}"`"#,
+                            name, default
+                        ),
+                    )
+                })
+                .unwrap()
+                .to_string()
+                .trim_matches('\"')
+                .to_owned()
+        })
+        .unwrap_or_else(|| default.to_string())
 }
 
-fn unique_implementor(ast: &syn::DeriveInput) -> quote::Tokens {
+fn unique_implementor(ast: &syn::DeriveInput) -> TokenStream {
     let name = &ast.ident;
     let (impl_generics, ty_generics, where_clause) = ast.generics.split_for_impl();
     let types_file_name = parse_attribute(&ast.attrs, "UniqueTypeIdFile", DEFAULT_TYPES_FILE_NAME);
@@ -137,16 +144,16 @@ fn unique_implementor(ast: &syn::DeriveInput) -> quote::Tokens {
     let gen_start: u64 = parse_attribute(&ast.attrs, "UniqueTypeIdStart", DEFAULT_ID_START)
         .parse()
         .unwrap();
-    let id_type = syn::parse_type(&id_type_name).unwrap();
-    let id = gen_id(&types_file_name, name.as_ref(), gen_start);
+    let id_type = syn::parse_str::<syn::Type>(&id_type_name).unwrap();
+    let id = gen_id(&types_file_name, &ast.ident.to_string(), gen_start);
 
     // TODO: Use TryFrom instead of `#id as #id_type` to avoid silently destructive casts
-    quote! {
+    TokenStream::from(quote! {
         impl #impl_generics unique_type_id::UniqueTypeId<#id_type> for #name #ty_generics #where_clause {
             const TYPE_ID: unique_type_id::TypeId<#id_type> = unique_type_id::TypeId(#id as #id_type);
             fn id() -> unique_type_id::TypeId<#id_type> {
-              Self::TYPE_ID
+                Self::TYPE_ID
             }
         }
-    }
+    })
 }
