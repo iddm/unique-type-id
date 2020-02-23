@@ -2,11 +2,13 @@
 name = "unique_type_id_workspace"
 version = "1.0.0"
 authors = ["Victor Polevoy <maintainer@vpolevoy.com>"]
-
 description = "A workspace for the unique type id crate."
+repository = "https://github.com/vityafx/unique-type-id"
+license = "MIT"
+keywords = ["unique", "type", "id", "number"]
 
 [dependencies]
-unique-type-id-derive = { path = "unique-type-id-derive" }
-unique-type-id = { path = "unique-type-id" }
+unique-type-id-derive = { path = "unique-type-id-derive", version = "1" }
+unique-type-id = { path = "unique-type-id", version = "1"}
 
 [workspace]
