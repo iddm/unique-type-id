@@ -45,7 +45,7 @@ fn read_file_into_string(file_name: &str) -> String {
 fn file_string_to_tree(file_contents: String) -> PairsMap {
     let mut map = PairsMap::new();
     file_contents
-        .split('\n')
+        .split(&['\n', '\r'])
         .map(pair_from_line)
         .filter(Option::is_some)
         .map(Option::unwrap)
@@ -67,7 +67,7 @@ fn append_pair_to_file(file_name: &str, record: &str, value: u64) {
     use std::io::Write;
 
     let mut f = OpenOptions::new()
-        .write(true)
+        .read(true)
         .append(true)
         .create(true)
         .open(file_name)
