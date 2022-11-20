@@ -1,6 +1,6 @@
 [package]
 name = "unique-type-id"
-version = "1.0.0"
+version = "1.0.1"
 authors = ["Victor Polevoy <fx@thefx.co>"]
 
 license = "MIT"
@@ -10,9 +10,6 @@ repository = "https://github.com/vityafx/unique-type-id"
 documentation = "https://docs.rs/unique-typeid/"
 readme = "README.md"
 categories = ["development-tools"]
-
-[badges]
-travis-ci = { repository = "vityafx/unique-type-id" }
 
 [dependencies]
 syn = "1"
