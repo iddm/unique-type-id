@@ -31,6 +31,8 @@ extern crate quote;
 extern crate syn;
 
 /// A strong type for type id.
+#[repr(transparent)]
+#[derive(Debug, Copy, Clone, Eq, PartialEq, Ord, PartialOrd, Hash)]
 pub struct TypeId<T>(pub T);
 
 /// A trait for providing a type id number.

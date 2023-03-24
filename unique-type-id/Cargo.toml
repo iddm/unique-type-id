@@ -1,6 +1,6 @@
 [package]
 name = "unique-type-id"
-version = "1.1.0"
+version = "1.2.0"
 authors = ["Victor Polevoy <fx@thefx.co>"]
 
 license = "MIT"

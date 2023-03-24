@@ -48,11 +48,11 @@ fn check_simple_second() {
     assert_eq!(Test4::id().0, 0u64);
     assert_eq!(Test5::id().0, 3u64);
 
-    assert_eq!(Test1::unique_type_id().0, 1u64);
-    assert_eq!(Test2::unique_type_id().0, 2u64);
-    assert_eq!(Test3::unique_type_id().0, 5u64);
-    assert_eq!(Test4::unique_type_id().0, 0u64);
-    assert_eq!(Test5::unique_type_id().0, 3u64);
+    assert_eq!(Test1::unique_type_id(), Test1::id());
+    assert_eq!(Test2::unique_type_id(), Test2::id());
+    assert_eq!(Test3::unique_type_id(), Test3::id());
+    assert_eq!(Test4::unique_type_id(), Test4::id());
+    assert_eq!(Test5::unique_type_id(), Test5::id());
 }
 
 #[test]
