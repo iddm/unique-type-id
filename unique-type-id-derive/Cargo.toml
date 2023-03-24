@@ -1,6 +1,6 @@
 [package]
 name = "unique-type-id-derive"
-version = "1.0.0"
+version = "1.1.0"
 authors = ["Victor Polevoy <fx@thefx.co>"]
 
 license = "MIT"
@@ -13,7 +13,7 @@ repository = "https://github.com/vityafx/unique-type-id"
 proc-macro = true
 
 [dependencies]
-syn = "1"
+syn = "2"
 quote = "1"
 unique-type-id = { path = "../unique-type-id", version = "1" }
 fs2 = "0.4"

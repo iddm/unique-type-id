@@ -46,9 +46,7 @@ fn file_string_to_tree(file_contents: String) -> PairsMap {
     let mut map = PairsMap::new();
     file_contents
         .split(&['\n', '\r'])
-        .map(pair_from_line)
-        .filter(Option::is_some)
-        .map(Option::unwrap)
+        .filter_map(pair_from_line)
         .for_each(|p| {
             map.insert(p.0, p.1);
         });
@@ -87,7 +85,7 @@ fn gen_id(file_name: &str, record: &str, start: u64) -> u64 {
             let mut new_id = start;
 
             loop {
-                if !pairs_map.values().find(|id| &new_id == *id).is_some() {
+                if !pairs_map.values().any(|id| &new_id == id) {
                     break;
                 }
                 new_id += 1;
@@ -104,21 +102,22 @@ fn implement_type_id(
     implementor: fn(&syn::DeriveInput) -> TokenStream,
 ) -> TokenStream {
     let ast = parse_macro_input!(input as syn::DeriveInput);
-    implementor(&ast).into()
+    implementor(&ast)
 }
 
 fn parse_attribute(attrs: &[syn::Attribute], name: &str, default: &str) -> String {
+    use quote::ToTokens;
     use syn::spanned::Spanned;
 
     attrs
         .iter()
-        .find(|a| a.path.is_ident(name))
+        .find(|a| a.path().is_ident(name))
         .map(|a| {
-            a.tokens
-                .clone()
+            a.meta
+                .to_token_stream()
                 .into_iter()
                 // Taking the second part of tokens, after the `=` sign.
-                .nth(1)
+                .nth(2)
                 .ok_or_else(|| {
                     syn::Error::new(
                         a.span(),
@@ -152,6 +151,12 @@ fn unique_implementor(ast: &syn::DeriveInput) -> TokenStream {
         impl #impl_generics unique_type_id::UniqueTypeId<#id_type> for #name #ty_generics #where_clause {
             const TYPE_ID: unique_type_id::TypeId<#id_type> = unique_type_id::TypeId(#id as #id_type);
             fn id() -> unique_type_id::TypeId<#id_type> {
+                Self::TYPE_ID
+            }
+        }
+
+        impl #name #ty_generics #where_clause {
+            const fn unique_type_id() -> unique_type_id::TypeId<#id_type> {
                 Self::TYPE_ID
             }
         }
