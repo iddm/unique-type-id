@@ -133,7 +133,7 @@ fn read_file_into_string(file_name: &str) -> String {
 fn file_string_to_tree(file_contents: String) -> PairsMap {
     let mut map = PairsMap::new();
     file_contents
-        .split(&['\n', '\r'])
+        .split(&['\n', '\r'][..])
         .filter_map(pair_from_line)
         .for_each(|p| {
             map.insert(p.0, p.1);
