@@ -1,12 +1,11 @@
 [package]
 name = "unique-type-id-derive"
-version = "1.2.0"
+version = "1.3.0"
 authors = ["Victor Polevoy <fx@thefx.co>"]
-
+edition = "2021"
 license = "MIT"
 description = "A unique id proc-macro generator for types."
 keywords = ["unique", "type", "id", "number"]
-
 repository = "https://github.com/vityafx/unique-type-id"
 
 [lib]
@@ -15,5 +14,7 @@ proc-macro = true
 [dependencies]
 syn = "2"
 quote = "1"
-unique-type-id = { path = "../unique-type-id", version = "1" }
 fs2 = "0.4"
+
+[dev-dependencies]
+unique-type-id = { path = "../unique-type-id" }

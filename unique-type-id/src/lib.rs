@@ -10,10 +10,6 @@
 //! The example usage:
 //!
 //! ```rust
-//!#[macro_use]
-//!extern crate unique_type_id_derive;
-//!extern crate unique_type_id;
-//!
 //!fn check_id() {
 //!    use unique_type_id::UniqueTypeId;
 //!
@@ -28,6 +24,8 @@
 //!}
 //! ```
 #![no_std]
+
+pub use unique_type_id_derive::*;
 
 /// A strong type for type id.
 #[repr(transparent)]

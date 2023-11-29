@@ -1,21 +1,15 @@
 #![recursion_limit = "128"]
-extern crate fs2;
-extern crate proc_macro;
-#[macro_use]
-extern crate quote;
-#[macro_use]
-extern crate syn;
-extern crate unique_type_id;
 
+use quote::quote;
+use syn::parse_macro_input;
+use fs2::FileExt;
+use proc_macro::TokenStream;
 use std::collections::BTreeMap;
 use std::fs::File;
 
-use fs2::FileExt;
-use proc_macro::TokenStream;
-
-static DEFAULT_TYPES_FILE_NAME: &'static str = "types.toml";
-static DEFAULT_ID_TYPE: &'static str = "u64";
-static DEFAULT_ID_START: &'static str = "0";
+static DEFAULT_TYPES_FILE_NAME: &str = "types.toml";
+static DEFAULT_ID_TYPE: &str = "u64";
+static DEFAULT_ID_START: &str = "0";
 
 type PairsMap = BTreeMap<String, u64>;
 

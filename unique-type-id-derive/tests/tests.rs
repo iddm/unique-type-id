@@ -1,7 +1,3 @@
-extern crate unique_type_id;
-#[macro_use]
-extern crate unique_type_id_derive;
-
 #[test]
 fn check_simple() {
     use unique_type_id::UniqueTypeId;
