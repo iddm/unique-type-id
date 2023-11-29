@@ -57,7 +57,7 @@ checksum = "3354b9ac3fae1ff6755cb6db53683adb661634f67557942dea4facebec0fee4b"
 name = "unique-type-id"
 version = "1.3.0"
 dependencies = [
- "unique-type-id-derive",
+ "unique-type-id-derive 1.3.0 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
 
 [[package]]
@@ -68,6 +68,17 @@ dependencies = [
  "quote",
  "syn",
  "unique-type-id",
+]
+
+[[package]]
+name = "unique-type-id-derive"
+version = "1.3.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "407e1420003f468eb3b9b7dafbed105a2add06b6a18e1291ea00ec81ee2de406"
+dependencies = [
+ "fs2",
+ "quote",
+ "syn",
 ]
 
 [[package]]
