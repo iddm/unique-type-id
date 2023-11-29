@@ -1,11 +1,11 @@
 #![recursion_limit = "128"]
 
-use quote::quote;
-use syn::parse_macro_input;
 use fs2::FileExt;
 use proc_macro::TokenStream;
+use quote::quote;
 use std::collections::BTreeMap;
 use std::fs::File;
+use syn::parse_macro_input;
 
 static DEFAULT_TYPES_FILE_NAME: &str = "types.toml";
 static DEFAULT_ID_TYPE: &str = "u64";
