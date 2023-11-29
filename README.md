@@ -1,9 +1,11 @@
 # unique-type-id
 A rust procedural macro crate for generating unique id for the rust types.
 
-
-[![](https://meritbadge.herokuapp.com/unique-type-id)](https://crates.io/crates/unique-type-id) [![](https://travis-ci.org/vityafx/unique-type-id.svg?branch=master)](https://travis-ci.org/vityafx/unique-type-id)
+[![Crates badge](https://img.shields.io/crates/v/unique_type_id.svg)](https://crates.io/crates/unique-type-id) 
+[![CI](https://github.com/vityafx/unique-type-id/actions/workflows/ci.yml/badge.svg)](https://github.com/vityafx/unique-type-id/actions/workflows/ci.yml)
+[![Documentation](https://docs.rs/unique-type-id/badge.svg)](https://docs.rs/unique-type-id)
 [![MIT licensed](https://img.shields.io/badge/license-MIT-blue.svg)](./LICENSE)
+[![GitHub Sponsors](https://img.shields.io/github/sponsors/vityafx)](https://github.com/sponsors/vityafx)
 
 
 ## What does it do?
