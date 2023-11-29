@@ -27,8 +27,7 @@
 //!    assert_eq!(Test2::id().0, 2u64);
 //!}
 //! ```
-extern crate quote;
-extern crate syn;
+#![no_std]
 
 /// A strong type for type id.
 #[repr(transparent)]

@@ -12,5 +12,3 @@ readme = "README.md"
 categories = ["development-tools"]
 
 [dependencies]
-syn = "2"
-quote = "1"
