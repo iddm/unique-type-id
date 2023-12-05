@@ -2,10 +2,10 @@
 A rust procedural macro crate for generating unique id for the rust types.
 
 [![Crates badge](https://img.shields.io/crates/v/unique_type_id.svg)](https://crates.io/crates/unique-type-id) 
-[![CI](https://github.com/vityafx/unique-type-id/actions/workflows/ci.yml/badge.svg)](https://github.com/vityafx/unique-type-id/actions/workflows/ci.yml)
+[![CI](https://github.com/iddm/unique-type-id/actions/workflows/ci.yml/badge.svg)](https://github.com/iddm/unique-type-id/actions/workflows/ci.yml)
 [![Documentation](https://docs.rs/unique-type-id/badge.svg)](https://docs.rs/unique-type-id)
 [![MIT licensed](https://img.shields.io/badge/license-MIT-blue.svg)](./LICENSE)
-[![GitHub Sponsors](https://img.shields.io/github/sponsors/vityafx)](https://github.com/sponsors/vityafx)
+[![GitHub Sponsors](https://img.shields.io/github/sponsors/iddm)](https://github.com/sponsors/iddm)
 
 
 ## What does it do?
@@ -103,4 +103,4 @@ Default and custom type files are searched relatively to a directory where `carg
  
 ## License
 
-This project is [licensed under the MIT license](https://github.com/vityafx/unique-type-id/blob/master/LICENSE).
+This project is [licensed under the MIT license](https://github.com/iddm/unique-type-id/blob/master/LICENSE).
