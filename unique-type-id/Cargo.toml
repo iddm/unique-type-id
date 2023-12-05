@@ -7,7 +7,7 @@ license = "MIT"
 description = "A unique id proc-macro generator for types."
 keywords = ["unique", "type", "id", "number"]
 repository = "https://github.com/vityafx/unique-type-id"
-documentation = "https://docs.rs/unique-typeid/"
+documentation = "https://docs.rs/unique-type-id/"
 readme = "README.md"
 categories = ["development-tools"]
 
