@@ -243,7 +243,7 @@ fn unique_implementor(ast: &syn::DeriveInput) -> TokenStream {
             }
         }
 
-        impl #name #ty_generics #where_clause {
+        impl #impl_generics #name #ty_generics #where_clause {
             const fn unique_type_id() -> unique_type_id::TypeId<#id_type> {
                 Self::TYPE_ID
             }
