@@ -114,3 +114,27 @@ fn check_empty_file_custom_start() {
     assert!(unique_ids.contains(&24u64));
     assert_ne!(Test1::id().0, Test2::id().0);
 }
+
+#[test]
+fn check_generic_type() {
+    use unique_type_id::UniqueTypeId;
+
+    #[derive(UniqueTypeId)]
+    struct Test6<T> {
+        _d: T,
+    }
+
+    assert_eq!(Test6::<u32>::id().0, 6u64);
+}
+
+#[test]
+fn check_lifetime() {
+    use unique_type_id::UniqueTypeId;
+
+    #[derive(UniqueTypeId)]
+    struct Test7<'a> {
+        _d: &'a str,
+    }
+
+    assert_eq!(Test7::id().0, 7u64);
+}
