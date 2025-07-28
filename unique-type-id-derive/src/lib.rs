@@ -126,7 +126,7 @@ fn read_file_into_string(file_name: &str) -> String {
     let mut contents = String::new();
     f.read_to_string(&mut contents)
         .expect("Unable to read the file");
-    f.unlock().expect("Unable to unlock the file");
+    fs2::FileExt::unlock(&f).expect("Unable to unlock the file");
     contents
 }
 
@@ -159,10 +159,10 @@ fn append_pair_to_file(file_name: &str, record: &str, value: u64) {
         .open(file_name)
         .expect("Unable to create file");
     f.lock_exclusive().expect("Unable to lock the file");
-    let contents = format!("{}={}\n", record, value);
+    let contents = format!("{record}={value}\n");
     f.write_all(contents.as_bytes())
         .expect("Unable to write to the file");
-    f.unlock().expect("Unable to unlock the file");
+    fs2::FileExt::unlock(&f).expect("Unable to unlock the file");
 }
 
 fn gen_id(file_name: &str, record: &str, start: u64) -> u64 {
@@ -209,10 +209,7 @@ fn parse_attribute(attrs: &[syn::Attribute], name: &str, default: &str) -> Strin
                 .ok_or_else(|| {
                     syn::Error::new(
                         a.span(),
-                        format!(
-                            r#"The attribute should be in the format: `{} = "{}"`"#,
-                            name, default
-                        ),
+                        format!(r#"The attribute should be in the format: `{name} = "{default}"`"#),
                     )
                 })
                 .unwrap()
