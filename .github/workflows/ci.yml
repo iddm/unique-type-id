@@ -1,15 +1,11 @@
 name: CI
-
 on: [push, pull_request]
-
 env:
-  minrust: 1.56.0
-
+  minrust: 1.78.0
 jobs:
   test:
     name: Test
     runs-on: ${{ matrix.os || 'ubuntu-latest' }}
-
     strategy:
       fail-fast: false
       matrix:
@@ -19,7 +15,6 @@ jobs:
           - nightly
           - macOS
           - Windows
-
         include:
           - name: beta
             toolchain: beta
@@ -29,11 +24,9 @@ jobs:
             os: macOS-latest
           - name: Windows
             os: windows-latest
-
     steps:
       - name: Checkout sources
         uses: actions/checkout@v4
-
       - name: Install toolchain
         id: tc
         uses: actions-rs/toolchain@v1
@@ -41,7 +34,6 @@ jobs:
           toolchain: ${{ matrix.toolchain || 'stable' }}
           profile: minimal
           override: true
-
       - name: Setup cache
         if: runner.os != 'macOS'
         uses: actions/cache@v4
@@ -51,23 +43,18 @@ jobs:
             ~/.cargo/git
             target
           key: ${{ runner.os }}-test-${{ steps.tc.outputs.rustc_hash }}-${{ hashFiles('**/Cargo.toml') }}
-
       - name: Build all features
         if: matrix.features == ''
         run: cargo build --all-features
-
       - name: Test all features
         if: matrix.features == ''
         run: cargo test --all-features
-
   clippy:
     name: Run clippy
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout sources
         uses: actions/checkout@v4
-
       - name: Install toolchain
         id: tc
         uses: actions-rs/toolchain@v1
@@ -75,7 +62,6 @@ jobs:
           toolchain: stable
           profile: minimal
           override: true
-
       - name: Setup cache
         uses: actions/cache@v4
         with:
@@ -84,16 +70,12 @@ jobs:
             ~/.cargo/git
             target
           key: ${{ runner.os }}-clippy-${{ steps.tc.outputs.rustc_hash }}-${{ hashFiles('**/Cargo.toml') }}
-
       - run: cargo clippy
-
   MSRV:
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout sources
         uses: actions/checkout@v4
-
       - name: Install toolchain (${{ env.minrust }})
         id: tc
         uses: actions-rs/toolchain@v1
@@ -101,7 +83,6 @@ jobs:
           toolchain: ${{ env.minrust }}
           profile: minimal
           override: true
-
       - name: Setup cache
         uses: actions/cache@v4
         with:
@@ -110,17 +91,13 @@ jobs:
             ~/.cargo/git
             target
           key: ${{ runner.os }}-msrv-${{ steps.tc.outputs.rustc_hash }}-${{ hashFiles('**/Cargo.toml') }}
-
       - run: cargo check --all-features
-
   doc:
     name: Build docs
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout sources
         uses: actions/checkout@v4
-
       - name: Install toolchain
         id: tc
         uses: actions-rs/toolchain@v1
@@ -128,7 +105,6 @@ jobs:
           toolchain: nightly
           profile: minimal
           override: true
-
       - name: Setup cache
         uses: actions/cache@v4
         with:
@@ -136,7 +112,6 @@ jobs:
             ~/.cargo/registry
             ~/.cargo/git
           key: ${{ runner.os }}-docs-${{ steps.tc.outputs.rustc_hash }}-${{ hashFiles('**/Cargo.toml') }}
-
       - name: Build docs
         run: |
           cargo doc

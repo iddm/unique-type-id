@@ -1,7 +1,7 @@
 # unique-type-id
 A rust procedural macro crate for generating unique id for the rust types.
 
-[![Crates badge](https://img.shields.io/crates/v/unique_type_id.svg)](https://crates.io/crates/unique-type-id) 
+[![Crates badge](https://img.shields.io/crates/v/unique_type_id.svg)](https://crates.io/crates/unique-type-id)
 [![CI](https://github.com/iddm/unique-type-id/actions/workflows/ci.yml/badge.svg)](https://github.com/iddm/unique-type-id/actions/workflows/ci.yml)
 [![Documentation](https://docs.rs/unique-type-id/badge.svg)](https://docs.rs/unique-type-id)
 [![MIT licensed](https://img.shields.io/badge/license-MIT-blue.svg)](./LICENSE)
@@ -17,6 +17,11 @@ there. You may also specify another file name if you want by using `UniqueTypeId
 2. If there are no attributes, it uses `types.toml` file name as types file name, otherwise uses specified one.
 3. For each type the macro is used it tries to find the type name in the types file. If it can find it, it returns
 it's id, otherwise it returns the available id. Reading tests helps in understanding this.
+
+## MSRV
+
+The MSRV is `1.78` as of `1.4.0` version of the crate and `1.56` for
+the versions below `1.4.0`.
 
 ## Usage
 
@@ -42,7 +47,7 @@ fn unique_simple() {
     assert_eq!(Test2::id().0, 2u64);
 }
 ```
- 
+
 This will generate a types file if it has not been created yet and put there ids, starting with `0`,
 for each type which was not found there. This is how it looks when you have predefined set of ids
 for your types:
@@ -100,7 +105,7 @@ struct Test;
 ## Note
 
 Default and custom type files are searched relatively to a directory where `cargo build` is called.
- 
+
 ## License
 
 This project is [licensed under the MIT license](https://github.com/iddm/unique-type-id/blob/master/LICENSE).
