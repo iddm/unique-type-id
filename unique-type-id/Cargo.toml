@@ -12,4 +12,4 @@ readme = "README.md"
 categories = ["development-tools"]
 
 [dependencies]
-unique-type-id-derive = { path = "../unique-type-id-derive" }
+unique-type-id-derive = { version = "1", path = "../unique-type-id-derive" }
